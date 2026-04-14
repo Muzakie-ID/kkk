@@ -1,6 +1,7 @@
 <?php
 session_start();
 include 'koneksi.php';
+include 'helpers.php';
 if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'admin') {
     header("Location: index.php");
     exit;
@@ -32,7 +33,6 @@ if (mysqli_num_rows($result) == 0) {
 $data = mysqli_fetch_assoc($result);
 mysqli_stmt_close($stmt);
 ?>
-<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -73,7 +73,7 @@ mysqli_stmt_close($stmt);
                             </tr>
                             <tr>
                                 <th class="text-muted">Tanggal</th>
-                                <td><?php echo htmlspecialchars(date('d F Y - H:i', strtotime($data['tanggal']))) . ' WIB'; ?></td>
+                                <td><?php echo htmlspecialchars(tanggal_indo($data['tanggal'], 'long')) . ' WIB'; ?></td>
                             </tr>
                             <tr>
                                 <th class="text-muted">Kategori</th>

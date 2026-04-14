@@ -17,9 +17,9 @@ if ($row['total'] > 0) {
 
 // Insert Admin (password: admin123)
 $password_admin = password_hash('admin123', PASSWORD_DEFAULT);
+$username = 'admin';
 $stmt = mysqli_prepare($conn, "INSERT INTO admin (username, password) VALUES (?, ?)");
 mysqli_stmt_bind_param($stmt, "ss", $username, $password_admin);
-$username = 'admin';
 mysqli_stmt_execute($stmt);
 mysqli_stmt_close($stmt);
 

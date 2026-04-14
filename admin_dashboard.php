@@ -1,6 +1,7 @@
 <?php
 session_start();
 include 'koneksi.php';
+include 'helpers.php';
 if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'admin') {
     header("Location: index.php");
     exit;
@@ -47,11 +48,14 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'admin') {
                         <select class="form-select" id="filter_kategori" name="filter_kategori">
                             <option value="">Semua Kategori</option>
                             <?php
-                            $qk = mysqli_query($conn, "SELECT * FROM kategori");
-                            while ($k = mysqli_fetch_array($qk)) {
+                            $stmt_kat = mysqli_prepare($conn, "SELECT * FROM kategori");
+                            mysqli_stmt_execute($stmt_kat);
+                            $result_kat = mysqli_stmt_get_result($stmt_kat);
+                            while ($k = mysqli_fetch_array($result_kat)) {
                                 $selected = (isset($_GET['filter_kategori']) && $_GET['filter_kategori'] == $k['id_kategori']) ? 'selected' : '';
                                 echo "<option value='" . (int)$k['id_kategori'] . "' " . $selected . ">" . htmlspecialchars($k['ket_kategori']) . "</option>";
                             }
+                            mysqli_stmt_close($stmt_kat);
                             ?>
                         </select>
                     </div>
@@ -148,7 +152,7 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'admin') {
                             ?>
                             <tr>
                                 <td><?php echo $no++; ?></td>
-                                <td><?php echo htmlspecialchars(date('d M Y', strtotime($data['tanggal']))); ?></td>
+                                <td><?php echo htmlspecialchars(tanggal_indo($data['tanggal'])); ?></td>
                                 <td><?php echo htmlspecialchars($data['nama'] . ' (' . $data['kelas'] . ')'); ?></td>
                                 <td><?php echo htmlspecialchars($data['ket_kategori']); ?></td>
                                 <td><?php echo htmlspecialchars($data['ket']); ?></td>

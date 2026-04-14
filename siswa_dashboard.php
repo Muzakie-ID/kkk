@@ -1,6 +1,7 @@
 <?php
 session_start();
 include 'koneksi.php';
+include 'helpers.php';
 if (!isset($_SESSION['nis']) || $_SESSION['role'] !== 'siswa') {
     header("Location: index.php");
     exit;
@@ -75,7 +76,7 @@ if (!isset($_SESSION['nis']) || $_SESSION['role'] !== 'siswa') {
                             ?>
                             <tr>
                                 <td><?php echo $no++; ?></td>
-                                <td><?php echo htmlspecialchars(date('d M Y', strtotime($data['tanggal']))); ?></td>
+                                <td><?php echo htmlspecialchars(tanggal_indo($data['tanggal'])); ?></td>
                                 <td><?php echo htmlspecialchars($data['ket_kategori']); ?></td>
                                 <td><?php echo htmlspecialchars($data['ket']); ?></td>
                                 <td><span class="badge <?php echo $badge; ?>"><?php echo htmlspecialchars($data['status']); ?></span></td>

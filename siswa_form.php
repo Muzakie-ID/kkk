@@ -42,10 +42,13 @@ if (!isset($_SESSION['nis']) || $_SESSION['role'] !== 'siswa') {
                                 <label for="id_kategori" class="form-label">Kategori Sarana/Prasarana</label>
                                 <select class="form-select" id="id_kategori" name="id_kategori" required>
                                     <?php
-                                    $query = mysqli_query($conn, "SELECT * FROM kategori");
-                                    while ($kategori = mysqli_fetch_array($query)) {
+                                    $stmt_kat = mysqli_prepare($conn, "SELECT * FROM kategori");
+                                    mysqli_stmt_execute($stmt_kat);
+                                    $result_kat = mysqli_stmt_get_result($stmt_kat);
+                                    while ($kategori = mysqli_fetch_array($result_kat)) {
                                         echo "<option value='" . (int)$kategori['id_kategori'] . "'>" . htmlspecialchars($kategori['ket_kategori']) . "</option>";
                                     }
+                                    mysqli_stmt_close($stmt_kat);
                                     ?>
                                 </select>
                             </div>
