@@ -1,5 +1,4 @@
 <?php
-/*
 // Konfigurasi Database
 $host     = "localhost";
 $username = "root";         // Sesuaikan dengan username database MySQL Anda (biasanya 'root' di Laragon)
@@ -13,5 +12,4 @@ $conn = mysqli_connect($host, $username, $password, $database);
 if (!$conn) {
     die("Koneksi gagal: " . mysqli_connect_error());
 }
-*/
 ?>

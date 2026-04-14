@@ -1,9 +1,10 @@
 <?php
-/*
 session_start();
 include 'koneksi.php';
-// if(!isset($_SESSION['nis'])) { header("Location: index.php"); exit; }
-*/
+if (!isset($_SESSION['nis']) || $_SESSION['role'] !== 'siswa') {
+    header("Location: index.php");
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -19,9 +20,10 @@ include 'koneksi.php';
             <a class="navbar-brand" href="siswa_dashboard.php">SIPAS - Siswa</a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><span class="nav-link text-white-50">Halo, <?php echo htmlspecialchars($_SESSION['nama']); ?></span></li>
                     <li class="nav-item"><a class="nav-link" href="siswa_dashboard.php">Histori Pengaduan</a></li>
                     <li class="nav-item"><a class="nav-link active" href="siswa_form.php">Buat Pengaduan</a></li>
-                    <li class="nav-item"><a class="nav-link text-danger" href="index.php">Logout</a></li>
+                    <li class="nav-item"><a class="nav-link text-danger" href="logout.php">Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -35,25 +37,16 @@ include 'koneksi.php';
                         <h4 class="mb-0">Form Aspirasi Siswa</h4>
                     </div>
                     <div class="card-body">
-                        <!-- <?php /* Form yang aktif untuk backend nantinya: <form action="proses_aspirasi.php" method="POST"> */ ?> -->
-                        <form action="siswa_dashboard.php" method="GET">
+                        <form action="proses_aspirasi.php" method="POST" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label for="id_kategori" class="form-label">Kategori Sarana/Prasarana</label>
-                                <select class="form-select" id="id_kategori" name="id_kategori">
-                                    <?php 
-                                    /* 
-                                    // Looping Kategori dari Database 
-                                    // $query = mysqli_query($conn, "SELECT * FROM kategori");
-                                    // while($kategori = mysqli_fetch_array($query)) {
-                                    //     echo "<option value='".$kategori['id_kategori']."'>".$kategori['ket_kategori']."</option>";
-                                    // } 
-                                    */
+                                <select class="form-select" id="id_kategori" name="id_kategori" required>
+                                    <?php
+                                    $query = mysqli_query($conn, "SELECT * FROM kategori");
+                                    while ($kategori = mysqli_fetch_array($query)) {
+                                        echo "<option value='" . (int)$kategori['id_kategori'] . "'>" . htmlspecialchars($kategori['ket_kategori']) . "</option>";
+                                    }
                                     ?>
-                                    <!-- Dummy Data (Akan Dihapus Saat Backend Aktif) -->
-                                    <option value="1">Fasilitas Kelas (Meja, Kursi, AC, Proyektor)</option>
-                                    <option value="2">Fasilitas Umum (Toilet, Kantin, Tempat Ibadah)</option>
-                                    <option value="3">Fasilitas Olahraga & Lab</option>
-                                    <option value="4">Kebersihan & Keamanan</option>
                                 </select>
                             </div>
                             <div class="mb-3">
@@ -62,11 +55,12 @@ include 'koneksi.php';
                             </div>
                             <div class="mb-3">
                                 <label for="ket" class="form-label">Deskripsi Pengaduan / Masukan</label>
-                                <textarea class="form-control" id="ket" name="ket" rows="4" placeholder="Jelaskan kerusakan atau masukan Anda secara rinci..."></textarea>
+                                <textarea class="form-control" id="ket" name="ket" rows="4" placeholder="Jelaskan kerusakan atau masukan Anda secara rinci..." required></textarea>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Lampiran Foto (Opsional)</label>
-                                <input type="file" class="form-control">
+                                <input type="file" class="form-control" name="lampiran" accept="image/jpeg,image/png,image/gif">
+                                <small class="text-muted">Format: JPG, PNG, GIF. Maks 2MB.</small>
                             </div>
                             <div class="d-flex justify-content-end">
                                 <button type="submit" class="btn btn-primary">Kirim Pengaduan</button>

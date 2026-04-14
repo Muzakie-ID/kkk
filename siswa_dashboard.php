@@ -1,9 +1,10 @@
 <?php
-/*
 session_start();
 include 'koneksi.php';
-// if(!isset($_SESSION['nis'])) { header("Location: index.php"); exit; }
-*/
+if (!isset($_SESSION['nis']) || $_SESSION['role'] !== 'siswa') {
+    header("Location: index.php");
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -22,9 +23,10 @@ include 'koneksi.php';
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><span class="nav-link text-white-50">Halo, <?php echo htmlspecialchars($_SESSION['nama']); ?> (<?php echo htmlspecialchars($_SESSION['kelas']); ?>)</span></li>
                     <li class="nav-item"><a class="nav-link active" href="siswa_dashboard.php">Histori Pengaduan</a></li>
                     <li class="nav-item"><a class="nav-link" href="siswa_form.php">Buat Pengaduan</a></li>
-                    <li class="nav-item"><a class="nav-link text-danger" href="index.php">Logout</a></li>
+                    <li class="nav-item"><a class="nav-link text-danger" href="logout.php">Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -50,44 +52,43 @@ include 'koneksi.php';
                             </tr>
                         </thead>
                         <tbody>
-                            <?php 
-                            /*
-                            // Contoh Loop Data dari Database
-                            // $nis = $_SESSION['nis'];
-                            // $query = mysqli_query($conn, "SELECT * FROM aspirasi JOIN input_aspirasi ... WHERE nis = '$nis'");
-                            // while($data = mysqli_fetch_array($query)) {
-                            // ?>
-                            // <tr>
-                            //     <td>1</td>
-                            //     <td><?php echo $data['tanggal']; ?></td>
-                            //     <td><?php echo $data['kategori']; ?></td>
-                            //     <td><?php echo $data['ket']; ?></td>
-                            //     <td><?php echo $data['status']; ?></td>
-                            //     <td><?php echo $data['progres']; ?></td>
-                            //     <td><?php echo $data['feedback']; ?></td>
-                            // </tr>
-                            // <?php } */
+                            <?php
+                            $nis = $_SESSION['nis'];
+                            $stmt = mysqli_prepare($conn, "SELECT a.*, k.ket_kategori 
+                                                            FROM aspirasi a 
+                                                            JOIN kategori k ON a.id_kategori = k.id_kategori 
+                                                            WHERE a.nis = ? 
+                                                            ORDER BY a.tanggal DESC");
+                            mysqli_stmt_bind_param($stmt, "s", $nis);
+                            mysqli_stmt_execute($stmt);
+                            $result = mysqli_stmt_get_result($stmt);
+
+                            $no = 1;
+                            while ($data = mysqli_fetch_assoc($result)) {
+                                // Badge warna berdasarkan status
+                                $badge = 'bg-warning text-dark';
+                                if ($data['status'] == 'Proses') {
+                                    $badge = 'bg-info text-white';
+                                } elseif ($data['status'] == 'Selesai') {
+                                    $badge = 'bg-success';
+                                }
                             ?>
-                            
-                            <!-- Dummy Data (Akan Dihapus Saat Backend Aktif) -->
                             <tr>
-                                <td>1</td>
-                                <td>10 Okt 2023</td>
-                                <td>Fasilitas Kelas</td>
-                                <td>AC di kelas XII RPL mati dan bocor.</td>
-                                <td><span class="badge bg-warning text-dark">Sedang Dikerjakan</span></td>
-                                <td>Tekisi sedang mengecek (50%)</td>
-                                <td>Laporan diterima, teknisi akan datang siang ini.</td>
+                                <td><?php echo $no++; ?></td>
+                                <td><?php echo htmlspecialchars(date('d M Y', strtotime($data['tanggal']))); ?></td>
+                                <td><?php echo htmlspecialchars($data['ket_kategori']); ?></td>
+                                <td><?php echo htmlspecialchars($data['ket']); ?></td>
+                                <td><span class="badge <?php echo $badge; ?>"><?php echo htmlspecialchars($data['status']); ?></span></td>
+                                <td><?php echo htmlspecialchars($data['progres'] ?? '-'); ?></td>
+                                <td><?php echo htmlspecialchars($data['feedback'] ?? '-'); ?></td>
                             </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>05 Sep 2023</td>
-                                <td>Kebersihan</td>
-                                <td>Toilet lantai 2 kotor dan air mati.</td>
-                                <td><span class="badge bg-success">Selesai</span></td>
-                                <td>Selesai diperbaiki (100%)</td>
-                                <td>Pompa air sudah diperbaiki dan toilet sudah dibersihkan.</td>
-                            </tr>
+                            <?php }
+                            mysqli_stmt_close($stmt);
+
+                            if ($no == 1) {
+                                echo '<tr><td colspan="7" class="text-center text-muted py-3">Belum ada pengaduan. <a href="siswa_form.php">Buat pengaduan baru</a></td></tr>';
+                            }
+                            ?>
                         </tbody>
                     </table>
                 </div>

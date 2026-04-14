@@ -1,18 +1,16 @@
 <?php
-/*
 session_start();
-include 'koneksi.php';
 
-// Contoh proses login:
-// if(isset($_POST['username'])) {
-//     $username = $_POST['username'];
-//     $password = $_POST['password'];
-//     // Cek login ke db...
-//     // $_SESSION['nis'] = $row['nis'];
-//     // $_SESSION['role'] = 'siswa';
-//     // header("Location: siswa_dashboard.php");
-// }
-*/
+// Jika sudah login, arahkan ke dashboard sesuai role
+if (isset($_SESSION['role'])) {
+    if ($_SESSION['role'] === 'admin') {
+        header("Location: admin_dashboard.php");
+        exit;
+    } elseif ($_SESSION['role'] === 'siswa') {
+        header("Location: siswa_dashboard.php");
+        exit;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -32,20 +30,18 @@ include 'koneksi.php';
             <div class="card-body">
                 <h3 class="text-center mb-4">Login SIPAS</h3>
                 <p class="text-center text-muted">Sistem Informasi Pengaduan Sarana Sekolah</p>
-                <!-- <?php /* Form yang aktif untuk backend nantinya: <form action="file_proses_login.php" method="POST"> */ ?> -->
-                <form action="siswa_dashboard.php" method="GET">
+                <form action="proses_login.php" method="POST">
                     <div class="mb-3">
                         <label for="username" class="form-label">Username / NIS</label>
-                        <input type="text" class="form-control" id="username" name="username" placeholder="Masukkan username">
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Masukkan username" required>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan password">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan password" required>
                     </div>
                     <div class="mb-3">
                         <label for="role" class="form-label">Login Sebagai</label>
-                        <select class="form-select" id="role" name="role" onchange="changeAction(this.value)">
-                            <!-- Tambahan values agar terbaca di PHP -->
+                        <select class="form-select" id="role" name="role">
                             <option value="siswa">Siswa</option>
                             <option value="admin">Admin</option>
                         </select>
@@ -55,11 +51,5 @@ include 'koneksi.php';
             </div>
         </div>
     </div>
-
-    <script>
-        function changeAction(url) {
-            document.querySelector('form').action = url;
-        }
-    </script>
 </body>
 </html>
